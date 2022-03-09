@@ -121,7 +121,10 @@ def writeObjIntoJSONFile(data, file_name):
 benign_unique_feature_vector, benign_feature_vector_dict = import_benign_files()
 malicious_unique_feature_vector, malicious_feature_vector_dict = import_malicious_files()
 
-combined_unique_feature_vector = benign_unique_feature_vector | malicious_unique_feature_vector
+combined_unique_feature_vector = benign_unique_feature_vector.union(malicious_unique_feature_vector)
+features_in_benign_not_in_malicious = benign_unique_feature_vector.difference(malicious_unique_feature_vector)
+features_in_malicious_not_in_benign = malicious_unique_feature_vector.difference(benign_unique_feature_vector)
+features_common_in_benign_and_malicious = benign_unique_feature_vector.intersection(malicious_unique_feature_vector)
 
 benign_binary_matrix = create_binary_matrix(combined_unique_feature_vector, benign_feature_vector_dict)
 malicious_binary_matrix = create_binary_matrix(combined_unique_feature_vector, malicious_feature_vector_dict)
@@ -129,3 +132,6 @@ malicious_binary_matrix = create_binary_matrix(combined_unique_feature_vector, m
 writeIntoFile(combined_unique_feature_vector, 'unique_feature_vector.txt')
 writeIntoFile(benign_binary_matrix, 'benign_binary_matrix.txt')
 writeIntoFile(malicious_binary_matrix, 'malicious_binary_matrix.txt')
+writeIntoFile(features_in_benign_not_in_malicious, 'features_in_benign_not_in_malicious.txt')
+writeIntoFile(features_in_malicious_not_in_benign, 'features_in_malicious_not_in_benign.txt')
+writeIntoFile(features_common_in_benign_and_malicious, 'features_common_in_benign_and_malicious.txt')
