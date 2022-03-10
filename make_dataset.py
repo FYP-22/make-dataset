@@ -5,7 +5,7 @@ import json
 BENIGN_FILE_DIR = 'benign-dataset/'
 MALICIOUS_FILE_DIR = 'malicious-dataset/'
 BENIGN_APKS_UNIQUE_API_CALLS = 'ben_unique_api_calls/'
-MALICOUS_APKS_UNIQUE_API_CALLS = ''
+MALICOUS_APKS_UNIQUE_API_CALLS = 'mal_unique_api_calls/'
 
 def get_all_api_calls(PATH):
   """
@@ -68,7 +68,8 @@ def import_benign_files(benign_unique_api_calls):
 
   return benign_unique_feature_vector, benign_feature_vector_dict
 
-def import_malicious_files():
+
+def import_malicious_files(malicious_unique_api_calls):
   """
   This function takes all the unique api calls specially for malicious apks
   and concatenate them to all the unique feature vector for malicious apks.
@@ -100,7 +101,8 @@ def import_malicious_files():
       # concat the feature vector
       malicious_unique_feature_vector += list(apk_feature_vector.splitlines())
   
-  # TODO: add the malicious unique api calls to the malicious unique feature vector
+  # add the malicious unique api calls to the malicious unique feature vector
+  malicious_unique_feature_vector += malicious_unique_api_calls
 
   # get all unique malicious feature vector
   malicious_unique_feature_vector = set(malicious_unique_feature_vector)
@@ -167,9 +169,11 @@ def writeObjIntoJSONFile(data, file_name):
 
 
 benign_unique_api_calls = get_all_api_calls(BENIGN_APKS_UNIQUE_API_CALLS)
-print('ben_api: ', len(benign_unique_api_calls))
+# print('ben_api: ', len(benign_unique_api_calls))
 benign_unique_feature_vector, benign_feature_vector_dict = import_benign_files(benign_unique_api_calls)
-# malicious_unique_feature_vector, malicious_feature_vector_dict = import_malicious_files()
+
+malicious_unique_api_calls = get_all_api_calls(MALICOUS_APKS_UNIQUE_API_CALLS)
+malicious_unique_feature_vector, malicious_feature_vector_dict = import_malicious_files(malicious_unique_api_calls)
 
 # combined_unique_feature_vector = benign_unique_feature_vector.union(malicious_unique_feature_vector)
 # features_in_benign_not_in_malicious = benign_unique_feature_vector.difference(malicious_unique_feature_vector)
