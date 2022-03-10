@@ -4,8 +4,38 @@ import json
 
 BENIGN_FILE_DIR = 'benign-dataset/'
 MALICIOUS_FILE_DIR = 'malicious-dataset/'
+BENIGN_APKS_UNIQUE_API_CALLS = 'ben_unique_api_calls/'
+MALICOUS_APKS_UNIQUE_API_CALLS = ''
 
-def import_benign_files():
+def get_all_api_calls(PATH):
+  """
+  This function get all the distinct api calls for all the apks
+  and make a list of them. After that, it will take only the unique
+  api calls for all the apks and return as a list.
+  """
+
+  all_api_calls = []
+  files = os.listdir(PATH)
+  for file in files:
+    fileObj = open(PATH + file, 'r')
+    api_calls = fileObj.read()
+    fileObj.close()
+
+    api_calls = api_calls.splitlines()
+    all_api_calls += api_calls
+
+  all_api_calls = set(all_api_calls)
+  return all_api_calls
+
+
+def import_benign_files(benign_unique_api_calls):
+  """
+  This function takes all the unique api calls specially for benign apks
+  and concatenate them to all the unique feature vector for benign apks.
+  In addition to this, this function also maintains the data of all the unique
+  features for respective apks in dictionary format.
+  """
+
   benign_feature_vector_dict = {}
   benign_unique_feature_vector = []
 
@@ -30,12 +60,22 @@ def import_benign_files():
       # concat the feature vector
       benign_unique_feature_vector += list(apk_feature_vector.splitlines())
   
+  # add the benign unique api calls to the benign unique feature vector
+  benign_unique_feature_vector += benign_unique_api_calls
+  
   # get all unique benign feature vector
   benign_unique_feature_vector = set(benign_unique_feature_vector)
 
   return benign_unique_feature_vector, benign_feature_vector_dict
 
 def import_malicious_files():
+  """
+  This function takes all the unique api calls specially for malicious apks
+  and concatenate them to all the unique feature vector for malicious apks.
+  In addition to this, this function also maintains the data of all the unique
+  features for respective apks in dictionary format.
+  """
+
   malicious_feature_vector_dict = {}
   malicious_unique_feature_vector = []
 
@@ -60,12 +100,19 @@ def import_malicious_files():
       # concat the feature vector
       malicious_unique_feature_vector += list(apk_feature_vector.splitlines())
   
+  # TODO: add the malicious unique api calls to the malicious unique feature vector
+
   # get all unique malicious feature vector
   malicious_unique_feature_vector = set(malicious_unique_feature_vector)
 
   return malicious_unique_feature_vector, malicious_feature_vector_dict
 
 def create_binary_matrix(all_apk_features, all_apk_features_dict):
+  """
+  This function specially focuses on creating the binary matrix for all the apks
+  and their feature vectors.
+  """
+  
   binary_matrix = []    # dim = (total_apks x len(all_apk_features))
 
   # store all apk names (i.e. keys in all_apk_features_dict) in list
@@ -118,20 +165,23 @@ def writeObjIntoJSONFile(data, file_name):
   json.dump(data, file_obj)
   file_obj.close()
 
-benign_unique_feature_vector, benign_feature_vector_dict = import_benign_files()
-malicious_unique_feature_vector, malicious_feature_vector_dict = import_malicious_files()
 
-combined_unique_feature_vector = benign_unique_feature_vector.union(malicious_unique_feature_vector)
-features_in_benign_not_in_malicious = benign_unique_feature_vector.difference(malicious_unique_feature_vector)
-features_in_malicious_not_in_benign = malicious_unique_feature_vector.difference(benign_unique_feature_vector)
-features_common_in_benign_and_malicious = benign_unique_feature_vector.intersection(malicious_unique_feature_vector)
+benign_unique_api_calls = get_all_api_calls(BENIGN_APKS_UNIQUE_API_CALLS)
+print('ben_api: ', len(benign_unique_api_calls))
+benign_unique_feature_vector, benign_feature_vector_dict = import_benign_files(benign_unique_api_calls)
+# malicious_unique_feature_vector, malicious_feature_vector_dict = import_malicious_files()
 
-benign_binary_matrix = create_binary_matrix(combined_unique_feature_vector, benign_feature_vector_dict)
-malicious_binary_matrix = create_binary_matrix(combined_unique_feature_vector, malicious_feature_vector_dict)
+# combined_unique_feature_vector = benign_unique_feature_vector.union(malicious_unique_feature_vector)
+# features_in_benign_not_in_malicious = benign_unique_feature_vector.difference(malicious_unique_feature_vector)
+# features_in_malicious_not_in_benign = malicious_unique_feature_vector.difference(benign_unique_feature_vector)
+# features_common_in_benign_and_malicious = benign_unique_feature_vector.intersection(malicious_unique_feature_vector)
 
-writeIntoFile(combined_unique_feature_vector, 'unique_feature_vector.txt')
-writeIntoFile(benign_binary_matrix, 'benign_binary_matrix.txt')
-writeIntoFile(malicious_binary_matrix, 'malicious_binary_matrix.txt')
-writeIntoFile(features_in_benign_not_in_malicious, 'features_in_benign_not_in_malicious.txt')
-writeIntoFile(features_in_malicious_not_in_benign, 'features_in_malicious_not_in_benign.txt')
-writeIntoFile(features_common_in_benign_and_malicious, 'features_common_in_benign_and_malicious.txt')
+# benign_binary_matrix = create_binary_matrix(combined_unique_feature_vector, benign_feature_vector_dict)
+# malicious_binary_matrix = create_binary_matrix(combined_unique_feature_vector, malicious_feature_vector_dict)
+
+# writeIntoFile(combined_unique_feature_vector, 'unique_feature_vector.txt')
+# writeIntoFile(benign_binary_matrix, 'benign_binary_matrix.txt')
+# writeIntoFile(malicious_binary_matrix, 'malicious_binary_matrix.txt')
+# writeIntoFile(features_in_benign_not_in_malicious, 'features_in_benign_not_in_malicious.txt')
+# writeIntoFile(features_in_malicious_not_in_benign, 'features_in_malicious_not_in_benign.txt')
+# writeIntoFile(features_common_in_benign_and_malicious, 'features_common_in_benign_and_malicious.txt')
