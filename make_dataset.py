@@ -1,4 +1,3 @@
-from base64 import encode
 import os
 import json
 
@@ -6,6 +5,8 @@ BENIGN_FILE_DIR = 'benign-dataset/'
 MALICIOUS_FILE_DIR = 'malicious-dataset/'
 BENIGN_APKS_UNIQUE_API_CALLS = 'ben_unique_api_calls/'
 MALICOUS_APKS_UNIQUE_API_CALLS = 'mal_unique_api_calls/'
+
+
 
 def get_all_api_calls(PATH):
   """
@@ -69,6 +70,7 @@ def import_benign_files(benign_unique_api_calls):
   return benign_unique_feature_vector, benign_feature_vector_dict
 
 
+
 def import_malicious_files(malicious_unique_api_calls):
   """
   This function takes all the unique api calls specially for malicious apks
@@ -109,6 +111,8 @@ def import_malicious_files(malicious_unique_api_calls):
 
   return malicious_unique_feature_vector, malicious_feature_vector_dict
 
+
+
 def create_binary_matrix(all_apk_features, all_apk_features_dict):
   """
   This function specially focuses on creating the binary matrix for all the apks
@@ -145,12 +149,16 @@ def create_binary_matrix(all_apk_features, all_apk_features_dict):
   
   return binary_matrix
 
+
+
 def writeIntoFile(data, file_name):
   file_obj = open(file_name, 'w')
   for feat in data:
     file_obj.write(str(feat))
     file_obj.write('\n')
   file_obj.close()
+
+
 
 def writeObjIntoTxtFile(data, file_name):
   file_obj = open(file_name, 'w')
@@ -162,6 +170,8 @@ def writeObjIntoTxtFile(data, file_name):
 
   file_obj.close()
 
+
+
 def writeObjIntoJSONFile(data, file_name):
   file_obj = open(file_name, 'w')
   json.dump(data, file_obj)
@@ -169,23 +179,22 @@ def writeObjIntoJSONFile(data, file_name):
 
 
 benign_unique_api_calls = get_all_api_calls(BENIGN_APKS_UNIQUE_API_CALLS)
-# print('ben_api: ', len(benign_unique_api_calls))
 benign_unique_feature_vector, benign_feature_vector_dict = import_benign_files(benign_unique_api_calls)
 
 malicious_unique_api_calls = get_all_api_calls(MALICOUS_APKS_UNIQUE_API_CALLS)
 malicious_unique_feature_vector, malicious_feature_vector_dict = import_malicious_files(malicious_unique_api_calls)
 
-# combined_unique_feature_vector = benign_unique_feature_vector.union(malicious_unique_feature_vector)
-# features_in_benign_not_in_malicious = benign_unique_feature_vector.difference(malicious_unique_feature_vector)
-# features_in_malicious_not_in_benign = malicious_unique_feature_vector.difference(benign_unique_feature_vector)
-# features_common_in_benign_and_malicious = benign_unique_feature_vector.intersection(malicious_unique_feature_vector)
+combined_unique_feature_vector = benign_unique_feature_vector.union(malicious_unique_feature_vector)
+features_in_benign_not_in_malicious = benign_unique_feature_vector.difference(malicious_unique_feature_vector)
+features_in_malicious_not_in_benign = malicious_unique_feature_vector.difference(benign_unique_feature_vector)
+features_common_in_benign_and_malicious = benign_unique_feature_vector.intersection(malicious_unique_feature_vector)
 
-# benign_binary_matrix = create_binary_matrix(combined_unique_feature_vector, benign_feature_vector_dict)
-# malicious_binary_matrix = create_binary_matrix(combined_unique_feature_vector, malicious_feature_vector_dict)
+benign_binary_matrix = create_binary_matrix(combined_unique_feature_vector, benign_feature_vector_dict)
+malicious_binary_matrix = create_binary_matrix(combined_unique_feature_vector, malicious_feature_vector_dict)
 
-# writeIntoFile(combined_unique_feature_vector, 'unique_feature_vector.txt')
-# writeIntoFile(benign_binary_matrix, 'benign_binary_matrix.txt')
-# writeIntoFile(malicious_binary_matrix, 'malicious_binary_matrix.txt')
-# writeIntoFile(features_in_benign_not_in_malicious, 'features_in_benign_not_in_malicious.txt')
-# writeIntoFile(features_in_malicious_not_in_benign, 'features_in_malicious_not_in_benign.txt')
-# writeIntoFile(features_common_in_benign_and_malicious, 'features_common_in_benign_and_malicious.txt')
+writeIntoFile(combined_unique_feature_vector, 'unique_feature_vector.txt')
+writeIntoFile(benign_binary_matrix, 'benign_binary_matrix.txt')
+writeIntoFile(malicious_binary_matrix, 'malicious_binary_matrix.txt')
+writeIntoFile(features_in_benign_not_in_malicious, 'features_in_benign_not_in_malicious.txt')
+writeIntoFile(features_in_malicious_not_in_benign, 'features_in_malicious_not_in_benign.txt')
+writeIntoFile(features_common_in_benign_and_malicious, 'features_common_in_benign_and_malicious.txt')
